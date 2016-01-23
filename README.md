@@ -1,2 +1,2 @@
 # wolf
-A distributed load tester written in Golang for MQTT based chat applications.
+A distributed load tester written in Go for MQTT based chat applications.
