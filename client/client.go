@@ -171,7 +171,7 @@ func (c *Client)listener() {
 	}else if c.listenType == LISTEN_TYPE_EXPLICIT {
 		stopper = time.NewTimer(c.ListenTill.Sub(c.StartingTime))
 	}
-	<-time.After(time.Now().Sub(c.StartingTime))
+	<-time.After(c.StartingTime.Sub(time.Now()))
 	for {
 		select {
 		case <-stopper.C:
