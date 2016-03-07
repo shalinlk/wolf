@@ -123,7 +123,7 @@ func (c *Client)ListenOnAttackingTopics() (error) {
 	}
 	//clean any previous trails
 	c.TopicsToListen = make(map[string]int, len(c.topicsToSend))
-	for topic,_ := range c.topicsToSend {
+	for topic, _ := range c.topicsToSend {
 		c.TopicsToListen[topic] = 0
 	}
 	return nil
@@ -136,11 +136,12 @@ func (c *Client)Run() (error) {
 		//select the attacker type
 		switch c.attackType {
 		case ATTACK_TYPE_DURATION:
-			c.attackForDuration()
+			go c.attackForDuration()
 		case ATTACK_TYPE_MESSAGE_NUMBER:
-			c.attackForMessageNumber()
+			go c.attackForMessageNumber()
 		case ATTACK_TYPE_NO_PLAN:
 			return errors.New("No attack plan..")
+		default:
 		}
 	}
 	//raise the listener
@@ -167,7 +168,7 @@ func (c *Client)listener() {
 	}()
 	var stopper *time.Timer
 	if c.listenType == LISTEN_TYPE_NO_PLAN {
-		stopper = time.NewTimer(time.Second *time.Duration(c.listenTimeOutSec))
+		stopper = time.NewTimer(time.Second * time.Duration(c.listenTimeOutSec))
 	}else if c.listenType == LISTEN_TYPE_EXPLICIT {
 		stopper = time.NewTimer(c.ListenTill.Sub(c.StartingTime))
 	}
@@ -181,7 +182,7 @@ func (c *Client)listener() {
 			c.receiveSync <- topic
 			if c.listenType == LISTEN_TYPE_NO_PLAN {
 				//todo : test reset operation of shared variable
-				stopper.Reset(time.Duration(time.Second*time.Duration(c.listenTimeOutSec)))
+				stopper.Reset(time.Duration(time.Second * time.Duration(c.listenTimeOutSec)))
 			}
 		}
 	}
@@ -221,9 +222,9 @@ func (c *Client)attackForDuration() {
 	tillTime := time.NewTimer(c.AttackTill.Sub(c.StartingTime))
 	waitTill := sync.WaitGroup{}
 	for topic, _ := range c.topicsToSend {
+		waitTill.Add(1)
 		go func(topic string) {
 			defer waitTill.Done()
-			waitTill.Add(1)
 			<-time.After(c.StartingTime.Sub(time.Now()))
 			i := 0
 			for {
@@ -252,9 +253,9 @@ func (c *Client)attackForMessageNumber() {
 	}()
 	waitTill := sync.WaitGroup{}
 	for topic, count := range c.topicsToSend {
+		waitTill.Add(1)
 		go func(topic string, count int) {
 			defer waitTill.Done()
-			waitTill.Add(1)
 			<-time.After(c.StartingTime.Sub(time.Now()))
 			for i := 0; i < count; i++ {
 				c.attackTunnel <- dataPack{qos: DEFAULT_QOS, topic: topic, payload:i}
@@ -268,7 +269,7 @@ func (c *Client)attackForMessageNumber() {
 	c.AttackTill = time.Now()
 }
 
-func (c *Client)Statistics() (error, models.Statistics) {
+func (c *Client)Statistics() (models.Statistics, error) {
 	c.windUp.Wait()
 	result := models.Statistics{}
 	if c.activeAttacker {
@@ -285,11 +286,11 @@ func (c *Client)Statistics() (error, models.Statistics) {
 		result.ReceivedTopics = c.ReceivedTopics
 		result.ReceivedDurationSec = int(c.ListenTill.Unix() - c.StartingTime.Unix())
 	}
-	return nil, result
+	return result, nil
 }
 
 type dataPack struct {
 	qos     int
 	topic   string
-	payload interface{}
+	;payload interface{}
 }
