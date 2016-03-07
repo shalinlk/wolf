@@ -172,7 +172,7 @@ func (c *Client)listener() {
 	}else if c.listenType == LISTEN_TYPE_EXPLICIT {
 		stopper = time.NewTimer(c.ListenTill.Sub(c.StartingTime))
 	}
-	<-time.After(time.Now().Sub(c.StartingTime))
+	<-time.After(c.StartingTime.Sub(time.Now()))
 	for {
 		select {
 		case <-stopper.C:
@@ -292,5 +292,5 @@ func (c *Client)Statistics() (models.Statistics, error) {
 type dataPack struct {
 	qos     int
 	topic   string
-	;payload interface{}
+	payload interface{}
 }
