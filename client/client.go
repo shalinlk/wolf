@@ -5,7 +5,7 @@ import (
 	MQTT "git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.golang.git"
 	"errors"
 	"sync"
-	"github.com/shalinlk/mqtt_paho_client_eval/models"
+	"github.com/shalinlk/wolf/models"
 )
 
 //todo : topic's QoS has to be considered
@@ -67,6 +67,7 @@ func mqttListener(recChan chan string, stopperChan chan bool) (func(*MQTT.Client
 		}
 	}
 }
+
 func (c *Client)Connect() (error) {
 	if token := c.con.Connect(); token.Wait() && token.Error() != nil {
 		return token.Error()
