@@ -3,7 +3,6 @@ import (
 	"time"
 	"github.com/shalinlk/wolf/models"
 	"sync"
-	"fmt"
 )
 
 type AttackPlan struct {
