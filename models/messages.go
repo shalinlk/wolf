@@ -18,3 +18,9 @@ type OutgoingPacket struct {
 type IncomingPacket struct {
 	BasicPacket
 }
+
+type Topics map[string]int
+
+func (t *Topics)AddTopic(topic string, qos int) {
+	t[topic] = qos
+}
