@@ -34,6 +34,7 @@ func NewDurationBasedAttacker(duration time.Duration, conn *Conn) *AttackPlan {
 				break
 			}
 		}
+		attacker.publisher.done()
 		close(attacker.deliveryNozzle)
 	}()
 	return attacker
@@ -49,6 +50,7 @@ func NewMsgCountBasedAttacker(count int, conn *Conn) *AttackPlan {
 		for i := 0; i < count; i++ {
 			attacker.deliveryNozzle <- attacker.publisher.deliveryNozzle
 		}
+		attacker.publisher.done()
 		close(attacker.deliveryNozzle)
 	}()
 	return attacker
@@ -71,15 +73,20 @@ func (a *AttackPlan)LaunchAttack(startTime time.Time, publisher *Publisher) (err
 type Publisher struct {
 	deliveryNozzle chan models.OutgoingPacket
 	topics         map[string]int
+	doneSignal	   chan struct{}
 }
 
 func (p *Publisher)NewPublisher(topics models.Topics) (*Publisher, error) {
-	return nil, nil
+	pub := &Publisher{}
+	pub.doneSignal = make(chan struct{}, len(topics))
+	return pub, nil
 }
 
 //NewGossipPublisher returns a publisher with random topics registered;
 func (p *Publisher)NewGossipPublisher(topicNumber int) (*Publisher, error) {
-	return nil, nil
+	pub := &Publisher{}
+	pub.doneSignal = make(chan struct{}, topicNumber)
+	return pub, nil
 }
 
 func (p *Publisher)run() {
@@ -90,7 +97,21 @@ func (p *Publisher)run() {
 				msg.Message = "blaw. blaww.. blawww... balwwww.... balwwwww....."
 				msg.QoS = qos
 				msg.Topic = topic
+				select {
+				case <- p.doneSignal:
+					break
+				default :
+					go func(msg models.OutgoingPacket) {
+						p.deliveryNozzle <- msg
+					}(msg)
+				}
 			}
 		}(topic, qos)
+	}
+}
+
+func (p *Publisher)done()  {
+	for i := 0 ;i < len(p.topics); i++ {
+		p.doneSignal <- struct{}
 	}
 }
