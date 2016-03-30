@@ -39,6 +39,7 @@ func NewTopicGen(path string) (*TopicGen, error) {
 		return tGen, err
 	}
 	tGen.topicSource = topics
+	topicGenPool[path] = tGen
 	return tGen, nil
 }
 
