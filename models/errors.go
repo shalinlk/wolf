@@ -12,3 +12,4 @@ func (e Error)Error() string {
 
 var ExpiredStartTimeError Error = Error{Code : 1007, Message : "Start time is already expired"}
 var InvalidPublisherError Error = Error{Code : 1007, Message : "Invalid publisher"}
+var ResourceNotFoundError Error = Error{Code : 1007, Message : "Specified resource not found"}

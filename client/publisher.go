@@ -84,13 +84,6 @@ func (p *Publisher)NewPublisher(topics models.Topics) (*Publisher, error) {
 	return pub, nil
 }
 
-//NewGossipPublisher returns a publisher with random topics registered;
-func (p *Publisher)NewGossipPublisher(topicNumber int) (*Publisher, error) {
-	pub := &Publisher{}
-	pub.doneSignal = make(chan struct{}, topicNumber)
-	return pub, nil
-}
-
 func (p *Publisher)run() {
 	for topic, qos := range p.topics {
 		go func(topic string, qos int) {
