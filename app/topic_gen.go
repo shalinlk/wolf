@@ -26,7 +26,7 @@ type TopicGen struct {
 
 type topic struct {
 	Topic string    `json:"topic"`
-	QoS   *int        `json:"qos,omitempty"`
+	QoS   *int      `json:"qos,omitempty"`
 }
 
 func NewTopicGen(path string) (*TopicGen, error) {
