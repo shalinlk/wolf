@@ -70,18 +70,18 @@ func (a *AttackPlan)attack(attackController func()) {
 	a.report.Duration = finishTime.Sub(startTime)
 }
 
-func (a *AttackPlan)LaunchAttack(startTime time.Time, publisher *Publisher) (error) {
+func (a *AttackPlan)LaunchAttack(startTime time.Time, publisher *Publisher) (models.Stati,error) {
 	if startTime.Before(time.Now()) {
-		return models.ExpiredStartTimeError
+		return a.report, models.ExpiredStartTimeError
 	}
 	if publisher == nil {
-		return models.InvalidPublisherError
+		return a.report, models.InvalidPublisherError
 	}
 	a.publisher = publisher
 	<-time.After(startTime.Sub(time.Now()))
 	a.ignite <- struct{}
 	a.doneSignal.Wait()
-	return nil
+	return a.report, nil
 }
 
 type Publisher struct {
@@ -90,7 +90,7 @@ type Publisher struct {
 	doneSignal     chan struct{}
 }
 
-func (p *Publisher)NewPublisher(topics models.Topics) (*Publisher, error) {
+func NewPublisher(topics models.Topics) (*Publisher, error) {
 	pub := &Publisher{}
 	pub.doneSignal = make(chan struct{}, len(topics))
 	return pub, nil

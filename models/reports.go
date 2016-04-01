@@ -1,7 +1,7 @@
 package models
 import "time"
 
-type Statistics interface {
+type Stati interface {
 	Report() ([]byte, error)
 }
 
@@ -35,7 +35,6 @@ type PubSubReport struct {
 func (s PubSubReport) Report() ([]byte, error) {
 	return []byte, nil
 }
-
 
 type Statistics struct {
 	SentTotal           int
