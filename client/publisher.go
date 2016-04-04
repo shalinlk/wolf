@@ -1,8 +1,9 @@
 package client
+
 import (
-	"time"
 	"github.com/shalinlk/wolf/models"
 	"sync"
+	"time"
 )
 
 type AttackPlan struct {
@@ -10,7 +11,7 @@ type AttackPlan struct {
 	publisher      *Publisher
 	doneSignal     sync.WaitGroup
 	deliveryNozzle chan models.OutgoingPacket
-	report			models.PublishReport
+	report         models.PublishReport
 }
 
 func newPlanePlanner() *AttackPlan {
@@ -30,7 +31,7 @@ func NewDurationBasedAttacker(duration time.Duration, conn *Conn) *AttackPlan {
 			for {
 				select {
 				//todo : consumer should not suspend the producer
-				case attacker.deliveryNozzle <- <- attacker.publisher.deliveryNozzle:
+				case attacker.deliveryNozzle <- <-attacker.publisher.deliveryNozzle:
 					count++
 				case <-stopper.C:
 					break
@@ -50,7 +51,7 @@ func NewMsgCountBasedAttacker(count int, conn *Conn) *AttackPlan {
 			i := 0
 			for i = 0; i < count; i++ {
 				//todo : consumer should not suspend the producer
-				attacker.deliveryNozzle <- <- attacker.publisher.deliveryNozzle
+				attacker.deliveryNozzle <- <-attacker.publisher.deliveryNozzle
 			}
 			attacker.report.Publish.Total = i
 		})
@@ -58,7 +59,7 @@ func NewMsgCountBasedAttacker(count int, conn *Conn) *AttackPlan {
 	return attacker
 }
 
-func (a *AttackPlan)attack(attackController func()) {
+func (a *AttackPlan) attack(attackController func()) {
 	a.doneSignal.Add(1)
 	defer a.publisher.done()
 	defer a.doneSignal.Done()
@@ -70,7 +71,7 @@ func (a *AttackPlan)attack(attackController func()) {
 	a.report.Publish.Duration = finishTime.Sub(startTime)
 }
 
-func (a *AttackPlan)LaunchAttack(startTime time.Time, publisher *Publisher) (models.Stati,error) {
+func (a *AttackPlan) LaunchAttack(startTime time.Time, publisher *Publisher) (models.Stati, error) {
 	if startTime.Before(time.Now()) {
 		return a.report, models.ExpiredStartTimeError
 	}
@@ -96,7 +97,7 @@ func NewPublisher(topics models.Topics) (*Publisher, error) {
 	return pub, nil
 }
 
-func (p *Publisher)run() {
+func (p *Publisher) run() {
 	for topic, qos := range p.topics {
 		go func(topic string, qos int) {
 			for {
@@ -117,7 +118,7 @@ func (p *Publisher)run() {
 	}
 }
 
-func (p *Publisher)done() {
+func (p *Publisher) done() {
 	for i := 0; i < len(p.topics); i++ {
 		p.doneSignal <- struct{}{}
 	}

@@ -1,4 +1,5 @@
 package models
+
 import "time"
 
 type Stati interface {
@@ -6,24 +7,24 @@ type Stati interface {
 }
 
 type Report struct {
-	Total    int    			`json:"total"`
-	Topics   map[string]int 	`json:"topics,omitempty"`
-	Duration time.Duration    	`json:"duration"`
+	Total    int            `json:"total"`
+	Topics   map[string]int `json:"topics,omitempty"`
+	Duration time.Duration  `json:"duration"`
 }
 
 type PublishReport struct {
-	Publish Report    `json:"publish,omitempty"`
+	Publish Report `json:"publish,omitempty"`
 }
 
-func (p PublishReport)FinalReport()([]byte, error) {
+func (p PublishReport) FinalReport() ([]byte, error) {
 	return []byte{}, nil
 }
 
 type SubscribeReport struct {
-	SubscribeReport Report    `json:"subscribe,omitempty"`
+	SubscribeReport Report `json:"subscribe,omitempty"`
 }
 
-func (s SubscribeReport )FinalReport() ([]byte, error) {
+func (s SubscribeReport) FinalReport() ([]byte, error) {
 	return []byte{}, nil
 }
 

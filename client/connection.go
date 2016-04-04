@@ -1,9 +1,9 @@
 package client
 
 import (
+	"fmt"
 	MQTT "git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.golang.git"
 	"github.com/shalinlk/wolf/models"
-	"fmt"
 )
 
 var connPool map[string]*Conn
@@ -36,11 +36,11 @@ func NewConnection(userId, clientId, password, host string) (*Conn, error) {
 	return conn, nil
 }
 
-func (c *Conn) RegisterPublisher(publisher <- chan models.OutgoingPacket) {
+func (c *Conn) RegisterPublisher(publisher <-chan models.OutgoingPacket) {
 	c.packetFlusher(publisher)
 }
 
-func (c *Conn) RegisterSubscriber() <- chan models.IncomingPacket {
+func (c *Conn) RegisterSubscriber() <-chan models.IncomingPacket {
 	broadcastPipe := make(chan models.IncomingPacket)
 	c.subscribers[len(c.subscribers)] = broadcastPipe
 	return broadcastPipe
@@ -57,8 +57,8 @@ func (c *Conn) packetDistributor() {
 	}
 }
 
-func (c *Conn) packetFlusher(publisher <- chan models.OutgoingPacket) {
-	go func(ch <- chan models.OutgoingPacket) {
+func (c *Conn) packetFlusher(publisher <-chan models.OutgoingPacket) {
+	go func(ch <-chan models.OutgoingPacket) {
 		for packet := range ch {
 			c.broadcastTunnel <- packet
 		}

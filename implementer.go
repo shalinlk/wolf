@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/shalinlk/wolf/client"
 	"github.com/HiFX/env_parser"
+	"github.com/shalinlk/wolf/app"
+	"github.com/shalinlk/wolf/client"
 	"github.com/shalinlk/wolf/models"
-"github.com/shalinlk/wolf/app"
 	"time"
 )
 
@@ -15,7 +15,7 @@ func main() {
 	envs := models.Envs{}
 	err := ep.Map(&envs)
 	if err != nil {
-		fmt.Println("Invalid environment variables : ", err )
+		fmt.Println("Invalid environment variables : ", err)
 		return
 	}
 	conn, err := client.NewConnection(envs.UserId, envs.ClientId, envs.Password, envs.Host)
@@ -34,7 +34,7 @@ func main() {
 		return
 	}
 	attacker := client.NewMsgCountBasedAttacker(100000, conn)
-	report, err := attacker.LaunchAttack(time.Now().Add(time.Duration(time.Second * 10)), publisher)
+	report, err := attacker.LaunchAttack(time.Now().Add(time.Duration(time.Second*10)), publisher)
 	if err != nil {
 		fmt.Println("Attacking error : ", err)
 		return
