@@ -39,5 +39,10 @@ func main() {
 		fmt.Println("Attacking error : ", err)
 		return
 	}
-	fmt.Println("Final Report : ", string(report))
+	rep, err := report.FinalReport()
+	if err != nil {
+		fmt.Println("Report gathering error : ", err)
+		return
+	}
+	fmt.Println("Final Report : ", string(rep))
 }

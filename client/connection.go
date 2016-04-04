@@ -14,7 +14,7 @@ type Conn struct {
 	con             *MQTT.Client
 	broadcastTunnel chan models.OutgoingPacket
 	receiverTunnel  chan models.IncomingPacket
-	subscribers     map[string]chan models.IncomingPacket
+	subscribers     map[int]chan models.IncomingPacket
 }
 
 func init() {
@@ -57,8 +57,8 @@ func (c *Conn) packetDistributor() {
 	}
 }
 
-func (c *Conn) packetFlusher(publisher chan models.OutgoingPacket) {
-	go func(ch chan models.OutgoingPacket) {
+func (c *Conn) packetFlusher(publisher <- chan models.OutgoingPacket) {
+	go func(ch <- chan models.OutgoingPacket) {
 		for packet := range ch {
 			c.broadcastTunnel <- packet
 		}

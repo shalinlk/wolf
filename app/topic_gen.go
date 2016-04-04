@@ -61,9 +61,9 @@ func (t *TopicGen)newTopics(count int, patchQoS models.QoS) models.Topics {
 	}
 	for i := 0; i < count; i ++ {
 		if t.topicSource[i].QoS == nil {
-			topics[t.topicSource[i].Topic] = applicableQoS[i % applicableQoSLength]
+			topics[t.topicSource[i].Topic] = int(applicableQoS[i % applicableQoSLength])
 		}else {
-			topics[t.topicSource[i].Topic] = models.QoS(t.topicSource[i].QoS)
+			topics[t.topicSource[i].Topic] = int((*t.topicSource[i].QoS))
 		}
 	}
 	return topics

@@ -2,7 +2,7 @@ package models
 import "time"
 
 type Stati interface {
-	Report() ([]byte, error)
+	FinalReport() ([]byte, error)
 }
 
 type Report struct {
@@ -15,16 +15,16 @@ type PublishReport struct {
 	Publish Report    `json:"publish,omitempty"`
 }
 
-func (p PublishReport)Report() ([]byte, error) {
-	return []byte, nil
+func (p PublishReport)FinalReport()([]byte, error) {
+	return []byte{}, nil
 }
 
 type SubscribeReport struct {
 	SubscribeReport Report    `json:"subscribe,omitempty"`
 }
 
-func (s SubscribeReport )Report() ([]byte, error) {
-	return []byte, nil
+func (s SubscribeReport )FinalReport() ([]byte, error) {
+	return []byte{}, nil
 }
 
 type PubSubReport struct {
@@ -32,8 +32,8 @@ type PubSubReport struct {
 	SubscribeReport
 }
 
-func (s PubSubReport) Report() ([]byte, error) {
-	return []byte, nil
+func (s PubSubReport) FinalReport() ([]byte, error) {
+	return []byte{}, nil
 }
 
 type Statistics struct {

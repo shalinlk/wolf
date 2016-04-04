@@ -10,7 +10,7 @@ type AttackPlan struct {
 	publisher      *Publisher
 	doneSignal     sync.WaitGroup
 	deliveryNozzle chan models.OutgoingPacket
-	report			models.Report
+	report			models.PublishReport
 }
 
 func newPlanePlanner() *AttackPlan {
@@ -30,13 +30,13 @@ func NewDurationBasedAttacker(duration time.Duration, conn *Conn) *AttackPlan {
 			for {
 				select {
 				//todo : consumer should not suspend the producer
-				case attacker.deliveryNozzle <- attacker.publisher.deliveryNozzle:
+				case attacker.deliveryNozzle <- <- attacker.publisher.deliveryNozzle:
 					count++
 				case <-stopper.C:
 					break
 				}
 			}
-			attacker.report.Total = count
+			attacker.report.Publish.Total = count
 		})
 	}()
 	return attacker
@@ -50,9 +50,9 @@ func NewMsgCountBasedAttacker(count int, conn *Conn) *AttackPlan {
 			i := 0
 			for i = 0; i < count; i++ {
 				//todo : consumer should not suspend the producer
-				attacker.deliveryNozzle <- attacker.publisher.deliveryNozzle
+				attacker.deliveryNozzle <- <- attacker.publisher.deliveryNozzle
 			}
-			attacker.report.Total = i
+			attacker.report.Publish.Total = i
 		})
 	}()
 	return attacker
@@ -67,7 +67,7 @@ func (a *AttackPlan)attack(attackController func()) {
 	attackController()
 	finishTime := time.Now()
 	close(a.deliveryNozzle)
-	a.report.Duration = finishTime.Sub(startTime)
+	a.report.Publish.Duration = finishTime.Sub(startTime)
 }
 
 func (a *AttackPlan)LaunchAttack(startTime time.Time, publisher *Publisher) (models.Stati,error) {
@@ -79,7 +79,7 @@ func (a *AttackPlan)LaunchAttack(startTime time.Time, publisher *Publisher) (mod
 	}
 	a.publisher = publisher
 	<-time.After(startTime.Sub(time.Now()))
-	a.ignite <- struct{}
+	a.ignite <- struct{}{}
 	a.doneSignal.Wait()
 	return a.report, nil
 }
@@ -119,6 +119,6 @@ func (p *Publisher)run() {
 
 func (p *Publisher)done() {
 	for i := 0; i < len(p.topics); i++ {
-		p.doneSignal <- struct{}
+		p.doneSignal <- struct{}{}
 	}
 }
